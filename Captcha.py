@@ -4,13 +4,14 @@ from http import cookiejar
 from urllib import parse
 from PIL import Image
 from Learning import *
+from svmutil import *
 import time
 import urllib
 import re
 
 now_path = str(os.getcwd()).replace('\\','/')+"/"
 
-def spider(select):
+def spider(select,flag):
     if select=="2":
         save_path = now_path + "captcha_test/"
     else:
@@ -18,7 +19,6 @@ def spider(select):
     file_name = now_path + "test.txt"
     # save_path = "G:/Spider/Spider_login/captcha/"
     base_url = "https://uems.sysu.edu.cn/jwxt/#!/login"
-    login_url = r"https://cas.sysu.edu.cn/cas/login?service=http%3A%2F%2Fuems.sysu.edu.cn%2Fjwxt%2Fapi%2Fsso%2Fcas%2Flogin%3Fpattern%3Dstudent-login"
     captcha_url = "https://cas.sysu.edu.cn/cas/captcha.jsp"
     headers = {}
     headers['Accept'] = "image/webp,image/apng,image/*,*/*;q=0.8"
@@ -34,12 +34,15 @@ def spider(select):
         for x in fp.readlines():
             captchas.append(str(x).strip())
         fp.close()
-        size = 201
-        begin = 101
+        size = 301
+        begin = 201
     else:
-        choose = input("\n1、Quick\n2、Accurate\n")
+        choose = input("1、Eigenvalue\n2、Pixel\n")
+        choose_svm = input("1、Simple\n2、Model\n")
         save_vectors(choose)
-        load_all()
+        if flag=='Y' or flag=='y':
+            train_model(choose)
+        load_all(choose_svm)
         size = 2
         begin = 1
     for i in range(begin,size):
@@ -64,12 +67,12 @@ def spider(select):
         fp.close()
         image = Image.open(save_path + now_road)
         image.show()
-        preprocess_image(image,i,select)
+        pre_processing_image(image,now_road[:-4],select)
         if select=="2":
             captcha = input("请输入验证码\n")
             captchas.append(captcha)
         else:
-            predict_image(now_road[:-4],choose)
+            predict_image(now_road[:-4],choose,choose_svm)
             print("Time:\t" + str(time.clock()))
     if select=="2":
         fp = open(save_path + "result.txt", "w")
@@ -78,24 +81,33 @@ def spider(select):
         fp.close()
 
 def re_preprocess():
-    for i in range(1,101):
-        save_path = now_path + "captcha_test/"
+    save_path = now_path + "captcha_test/"
+    for i in range(1,len(os.listdir(save_path))//2):
         now_road = "0"
         if i<100:
             now_road += "0"
         if i<10:
             now_road += "0"
         now_road += str(i) + ".png"
-        preprocess_image(Image.open(save_path + now_road),i,"2")
+        pre_processing_image(Image.open(save_path + now_road),now_road[:-4],"2")
 
 if __name__ == '__main__':
+    flag = input("Proprecess the data? Y or N\n")
+    if flag=="Y" or flag == "y":
+        pre_processing()
+        divide_pic()
     select = input("1、Test one\n2、Get Data\n3、Test All\n")
     if select!="3":
-        spider(select)
+        spider(select,flag)
     else:
-        re_preprocess()
-        choose = input("\n1、Quick\n2、Accurate\n")
+        if flag=="Y" or flag=="y":
+            re_preprocess()
+        choose = input("1、Eigenvalue\n2、Pixel\n")
+        choose_svm = input("1、Simple\n2、Model\n")
         save_vectors(choose)
-        load_all()
-        predict(choose)
+        if flag=="Y" or flag=="y":
+            if choose_svm=="2":
+                train_model(choose)
+        load_all(choose_svm)
+        predict(choose,choose_svm)
 
