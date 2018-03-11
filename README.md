@@ -14,7 +14,7 @@ Eigenvalue: 用自己设定的特征值作为训练集
 Accurate: 直接用像素作为训练集  
   
   
-Simple:直接遍历的方法，较慢
+Simple:直接遍历的方法，较慢  
 Model:用模型预测，较快
 
 过程写到博客上了，地址是：http://blog.csdn.net/qq_35923581/article/details/79487579 
