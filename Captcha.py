@@ -109,5 +109,7 @@ if __name__ == '__main__':
             if choose_svm=="2":
                 train_model(choose)
         load_all(choose_svm)
+        time.clock()
         predict(choose,choose_svm)
+        print("Time:\t" + str(time.clock()))
 

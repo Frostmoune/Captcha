@@ -16,6 +16,7 @@ def get_bin_table(thresold = 170):
             table.append(1)
     return table # 得到的一个list，其0~thresold-1项为0，thresold~255项为1
 
+# 得到图像中所有点的特征值
 def get_pixel(image):
     fp = open("test.txt","w")
     for i in range(0,image.size[0]):
@@ -120,18 +121,19 @@ def get_all_pixel(image):
                 res.append("0")
     return res
 
+# 根据选取规则得到图像特征值
 def get_all_eigen_b(image):
     res = [0 for i in range(17)]
     sum_pixel = 0
     for i in range(4):
         for j in range(4):
-            now_image = image.crop((j*4,i*4,(j+1)*4,(i+1)*4))
+            now_image = image.crop((j*4,i*6,(j+1)*4,(i+1)*6)) # 分割图像
             now_pixel = 0
             for x in range(now_image.size[0]):
                 for y in range(now_image.size[1]):
                     if now_image.getpixel((x,y))==0:
-                        now_pixel += 1
-            res[i*4+j] = now_pixel/24
+                        now_pixel += 1 # 计算黑色点数量
+            res[i*4+j] = now_pixel/24 # 计算黑色点比例
             sum_pixel += now_pixel
     res[16] = sum_pixel/384
     return res
@@ -139,6 +141,7 @@ def get_all_eigen_b(image):
 char_vectors = {}
 
 def divide_pic():
+    # 在路径下新建文件夹，名字为a-z,0-9,用于存储分割后的验证码
     for i in range(26):
         if not os.path.exists(divide_path + chr(i+97)):
             os.mkdir(divide_path + chr(i+97))
@@ -146,7 +149,7 @@ def divide_pic():
         char_vectors[str(j)] = []
         if not os.path.exists(divide_path + str(j)):
             os.mkdir(divide_path + str(j))
-    fp = open(read_path + "/result.txt")
+    fp = open(read_path + "/result.txt") # 验证码训练集的答案路径
     divide_name = []
     for x in fp.readlines():
         divide_name.append(str(x).strip())
@@ -158,27 +161,27 @@ def divide_pic():
         if i<10:
             now_road += "0"
         read_road = now_road + str(i) + ".png"
-        now_image = Image.open(need_path + read_road)
-        for j in range(4):
-            child_image = now_image.crop((j*16,0,(j+1)*16,24))
+        now_image = Image.open(need_path + read_road) # 读取处理后的验证码
+        for j in range(4):# 每张验证码有四个字符
+            child_image = now_image.crop((j*16,0,(j+1)*16,24)) # 分割验证码图片（均分）
             write_road = now_road + str(i) + "-" + str(j) + ".png"
-            child_image.save(divide_path + divide_name[i-1][j] + "/" + write_road)
+            child_image.save(divide_path + divide_name[i-1][j] + "/" + write_road) # 存储分割后的图片
 
 def save_vectors(select):
     for i in range(26):
         char_vectors[chr(i+97)] = []
     for j in range(10):
-        char_vectors[str(j)] = []
+        char_vectors[str(j)] = [] # 存放不同字符及其对应的特征向量
     for key in char_vectors:
         for x in os.listdir(divide_path + key):
             now_png = str(x)
             if now_png[-4:]==".png":
-                image = Image.open(divide_path + key + "/" + now_png, "r")
+                image = Image.open(divide_path + key + "/" + now_png, "r") # 打开一张图片
                 if select=="2":
-                    char_vectors[key].append(get_all_pixel(image))
+                    char_vectors[key].append(get_all_pixel(image)) # 像素值作为特征值
                 else:
-                    char_vectors[key].append(get_all_eigen_b(image))
-        fp = open(divide_path + key + "/vectors.txt", "w")
+                    char_vectors[key].append(get_all_eigen_b(image)) # 黑点比例作为特征值
+        fp = open(divide_path + key + "/vectors.txt", "w") # 保存
         for i in range(len(char_vectors[key])):
             for j in range(len(char_vectors[key][i])):
                 fp.write(str(char_vectors[key][i][j]))
