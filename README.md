@@ -18,3 +18,6 @@ Simple:直接遍历的方法，较慢
 Model:用模型预测，较快
 
 过程写到博客上了，地址是：http://blog.csdn.net/qq_35923581/article/details/79487579 
+
+## Captcha_tensorflow.py  
+用tensorflow训练模型并测试，测试集准确率达到93.5%  

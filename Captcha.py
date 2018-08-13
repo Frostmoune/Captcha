@@ -112,4 +112,3 @@ if __name__ == '__main__':
         time.clock()
         predict(choose,choose_svm)
         print("Time:\t" + str(time.clock()))
-

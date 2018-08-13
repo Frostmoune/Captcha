@@ -1,7 +1,6 @@
 import os
 from PIL import Image
 from PIL import ImageDraw
-from svmutil import *
 
 after_table = [[0 for x in range(64)] for x in range(24)]
 after_table_b = [[0 for x in range(90)] for x in range(32)]
@@ -102,14 +101,14 @@ def pre_processing():
         now_road += str(i) + ".png"
         print(now_road)
         now_image = Image.open(read_path + now_road) # 打开一张图片
-        clear_noise(now_image,2) # 第一步，去除干扰线
+        clear_noise(now_image, 2) # 第一步，去除干扰线
         now_image.save(first_path + now_road) # 可省略，存储清除了干扰线的图片 
         now_image = now_image.convert("L") # "L"表示灰度图
         now_image.save(gray_path + now_road) # 可省略，存储灰度图
         bin_image = now_image.point(table, '1') # 用重新描点画图的方式得到二值图
-        bin_image.save(binary_path + now_road) # 可省略，存储二值图
-        clear_noise(bin_image,1) # 最后一步，对二值图去噪
-        bin_image.resize((64, 24),Image.ANTIALIAS).save(need_path + now_road) # 改变图片的分辨率后，将最终的图片存储下来
+        clear_noise(bin_image, 1) # 最后一步，对二值图去噪
+        bin_image.resize((88, 32), Image.ANTIALIAS).save(binary_path + now_road) # 可省略，存储二值图
+        bin_image.resize((64, 24), Image.ANTIALIAS).save(need_path + now_road) # 改变图片的分辨率后，将最终的图片存储下来
 
 def get_all_pixel(image):
     res = []

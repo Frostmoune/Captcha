@@ -36,3 +36,4 @@ def divideDraw(color_map):
 
 test_image = Image.open(now_path + "captcha/0001.png")# 打开一张验证码
 divideDraw(divideColor(test_image))
+
